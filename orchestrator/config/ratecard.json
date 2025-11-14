@@ -1,0 +1,48 @@
+{
+  "roles": {
+    "Project Manager": {
+      "hourly_rate": 150,
+      "description": "Project planning and coordination"
+    },
+    "Business Analyst": {
+      "hourly_rate": 120,
+      "description": "Requirements gathering and analysis"
+    },
+    "Solution Architect": {
+      "hourly_rate": 180,
+      "description": "System design and architecture"
+    },
+    "Backend Developer": {
+      "hourly_rate": 130,
+      "description": "Server-side development"
+    },
+    "Frontend Developer": {
+      "hourly_rate": 120,
+      "description": "Client-side development"
+    },
+    "DevOps Engineer": {
+      "hourly_rate": 140,
+      "description": "Infrastructure and deployment"
+    },
+    "QA Engineer": {
+      "hourly_rate": 100,
+      "description": "Quality assurance and testing"
+    },
+    "UI/UX Designer": {
+      "hourly_rate": 110,
+      "description": "User interface and experience design"
+    },
+    "Data Engineer": {
+      "hourly_rate": 140,
+      "description": "Data processing and ETL"
+    },
+    "Security Specialist": {
+      "hourly_rate": 160,
+      "description": "Security assessment and implementation"
+    }
+  },
+  "default_role": {
+    "hourly_rate": 100,
+    "description": "General development"
+  }
+}

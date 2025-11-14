@@ -1,0 +1,17 @@
+{
+  "small": {
+    "team_size": 1,
+    "timeline_weeks": 4,
+    "complexity": "low"
+  },
+  "medium": {
+    "team_size": 3,
+    "timeline_weeks": 8,
+    "complexity": "medium"
+  },
+  "large": {
+    "team_size": 5,
+    "timeline_weeks": 12,
+    "complexity": "high"
+  }
+}
