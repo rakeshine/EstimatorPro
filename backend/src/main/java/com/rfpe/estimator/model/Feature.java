@@ -10,7 +10,6 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
@@ -37,12 +36,18 @@ public class Feature {
     @JsonIgnore
     private Epic epic;
 
-    @Column(name = "effort_size", nullable = false)
+    @Column(name = "effort_size")
     @Enumerated(EnumType.STRING)
     private EffortSize effortSize;
 
-    @OneToMany(mappedBy = "feature", fetch = FetchType.LAZY)
-    private List<Resource> resources;
+    @Column(name = "complexity_buffer")
+    private Integer complexityBuffer;
+
+    @Column(name = "integration_buffer")
+    private Integer integrationBuffer;
+
+    @Column(name = "requirements_clarity_buffer")
+    private Integer requirementsClarityBuffer;
 
     @PrePersist
     protected void onCreate() {

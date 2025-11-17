@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import java.util.List;
 import java.time.LocalDateTime;
 
 @Data
@@ -45,8 +47,11 @@ public class RFP {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @OneToOne(mappedBy = "rfp", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "rfp", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private RFPSummary rfpSummary;
+
+    @OneToMany(mappedBy = "rfp", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Resource> resources;
     
     @PrePersist
     protected void onCreate() {

@@ -5,41 +5,43 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "epic")
-public class Epic {
-
+@Table(name = "allocation")
+public class Allocation {
     @Id
-    @Column(name = "epic_id")
-    private String epicId;
+    private String allocationId;
 
-    @Column(name = "epic_description", nullable = false, columnDefinition = "TEXT")
-    private String epicDescription;
+    @Column(name = "allocation_percent", nullable = false)
+    private float allocationPercent;
 
     @Column(name = "created_on", nullable = false)
     private LocalDateTime createDateTime;
-    
+
     @Column(name = "updated_on", nullable = false)
     private LocalDateTime updateDateTime;
 
-    @ManyToOne
-    @JoinColumn(name = "rfp_summary_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resource_id", nullable = false)
     @JsonIgnore
-    private RFPSummary rfpSummary;
-
-    @OneToMany(mappedBy = "epic", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Feature> features;
+    private Resource resource;
 
     @PrePersist
     protected void onCreate() {

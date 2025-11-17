@@ -7,10 +7,8 @@ import {
   Typography, 
   useTheme,
   Container,
-  Button,
   styled
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: 'white',
@@ -24,7 +22,7 @@ const MainContent = styled('main')(({ theme }) => ({
   padding: theme.spacing(3),
   backgroundColor: theme.palette.grey[50],
   minHeight: '100vh',
-  width: '100%',
+  width: '150%',
   [theme.breakpoints.up('lg')]: {
     padding: theme.spacing(4, 6),
   },
@@ -70,7 +68,7 @@ export default function Layout({ children, onAddRfp }: LayoutProps) {
       </StyledAppBar>
       
       <MainContent>
-        <Toolbar sx={{ minHeight: '40px !important' }} />
+        <Toolbar sx={{ minHeight: '35px !important' }} />
         <Container maxWidth="xl" sx={{ height: '100%' }}>
           {children}
         </Container>

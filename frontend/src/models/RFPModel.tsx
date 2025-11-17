@@ -1,4 +1,4 @@
-interface RFPModel {
+export interface RFPModel {
   rfpId: string;
   originalFilename: string;
   clientName: string;
@@ -9,9 +9,10 @@ interface RFPModel {
   status?: string;
   content?: string;
   rfpSummary?: RFPSummary;
+  resources?: Resource[];
 }
 
-interface RFPSummary {
+export interface RFPSummary {
   summaryId: string;
   summary?: string;
   functionalRequirements?: string;
@@ -21,7 +22,7 @@ interface RFPSummary {
   epics?: Epic[];
 }
 
-interface Epic {
+export interface Epic {
   epicId: string;
   epicDescription?: string;
   createDateTime?: string;
@@ -29,11 +30,27 @@ interface Epic {
   features?: Feature[];
 }
 
-interface Feature {
+export interface Feature {
   featureId: string;
   featureDescription?: string;
   createDateTime?: string;
   updateDateTime?: string;
+  effortSize?: string;
+  complexityBuffer? : number;
+  integrationBuffer? : number;
+  requirementsClarityBuffer? : number;
+}
+
+export interface Resource {
+  resourceId: string;
+  resourceType?: string;
+  count?: number;
+  allocations?: Allocation[];
+}
+
+export interface Allocation {
+  allocationId: string;
+  allocationPercent: number;
 }
 
 export default RFPModel;  

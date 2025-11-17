@@ -119,6 +119,24 @@ const Home = () => {
     }
   };
 
+  const handleDelete = async (rfpId: string) => {
+    if (window.confirm('Are you sure you want to delete this RFP? This action cannot be undone.')) {
+      try {
+        const response = await fetch(`/api/rfp/${rfpId}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Failed to delete RFP');
+        await response.json();
+        // refresh list
+        const updated = await fetch('/api/rfps');
+        const updatedData = await updated.json();
+        setRfps(updatedData);
+      } catch (error) {
+        console.error('Error deleting RFP:', error);
+      }
+    }
+  };
+
   const handleRequestSort = (property: keyof RFP) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -250,7 +268,15 @@ const Home = () => {
                         onClick={() => navigate(`/rfp/${rfp.rfpId}`)}
                         size="small"
                       >
-                        View
+                        Edit
+                      </Button> &nbsp;
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleDelete(rfp.rfpId)}
+                        size="small"
+                      >
+                        Delete
                       </Button>
                     </TableCell>
                   </TableRow>

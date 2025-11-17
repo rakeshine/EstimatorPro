@@ -1,12 +1,15 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import { TreeItem, TreeItemProps } from '@mui/x-tree-view/TreeItem';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { Typography, CircularProgress } from '@mui/material';
-import DocumentIcon from '@mui/icons-material/DescriptionOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import FolderIcon from '@mui/icons-material/Folder';
-import CategoryIcon from '@mui/icons-material/Category';
+import AddBoxIcon from '@mui/icons-material/AddBox';
+import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox';
+
+import { styled } from '@mui/material/styles';
+import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
+import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
+import Button from '@mui/material/Button';
 
 interface RFPNode {
   id: string;
@@ -21,69 +24,67 @@ interface RFPTreeViewProps {
   onNodeSelect: (nodeId: string, nodeType: string) => void;
 }
 
-const CustomTreeItem = React.forwardRef(function CustomTreeItem(
-  props: TreeItemProps & {
-    nodeType?: string;
-    selectedNodeId?: string | null;
-    item?: RFPNode;  // Add this line
+const CustomTreeItem = styled(TreeItem)({
+  [`& .${treeItemClasses.iconContainer}`]: {
+    '& .close': {
+      opacity: 0.3,
+    },
   },
-  ref: React.Ref<HTMLLIElement>,
-) {
-  const { nodeType, selectedNodeId, itemId, item, ...other } = props;
-  const isSelected = selectedNodeId === itemId;
-
-  const getIcon = () => {
-    const iconStyle = { mr: 1, fontSize: 18 };
-    const type = nodeType || item?.type;
-    switch (type) {
-      case 'rfp': return <DocumentIcon color="primary" sx={iconStyle} />;
-      case 'summary': return <DescriptionOutlinedIcon color="secondary" sx={iconStyle} />;
-      case 'epic': return <FolderIcon color="warning" sx={iconStyle} />;
-      case 'feature': return <CategoryIcon color="success" sx={iconStyle} />;
-      default: return null;
-    }
-  };
-
-  return (
-    <TreeItem
-      ref={ref}
-      {...other}
-      itemId={itemId}
-      label={
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: isSelected ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
-            p: 0.5,
-            borderRadius: 1,
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
-            },
-          }}
-        >
-          {getIcon()}
-          <Typography variant="body2">{props.label}</Typography>
-        </Box>
-      }
-    />
-  );
 });
+
+function CloseSquare(props: SvgIconProps) {
+  return (
+    <SvgIcon
+      className="close"
+      fontSize="inherit"
+      style={{ width: 14, height: 14 }}
+      {...props}
+    >
+      {/* tslint:disable-next-line: max-line-length */}
+      <path d="M17.485 17.512q-.281.281-.682.281t-.696-.268l-4.12-4.147-4.12 4.147q-.294.268-.696.268t-.682-.281-.281-.682.294-.669l4.12-4.147-4.12-4.147q-.294-.268-.294-.669t.281-.682.682-.281.696 .268l4.12 4.147 4.12-4.147q.294-.268.696-.268t.682.281 .281.669-.294.682l-4.12 4.147 4.12 4.147q.294.268 .294.669t-.281.682zM22.047 22.074v0 0-20.147 0h-20.12v0 20.147 0h20.12zM22.047 24h-20.12q-.803 0-1.365-.562t-.562-1.365v-20.147q0-.776.562-1.351t1.365-.575h20.147q.776 0 1.351.575t.575 1.351v20.147q0 .803-.575 1.365t-1.378.562v0z" />
+    </SvgIcon>
+  );
+}
 
 const RFPTreeView: React.FC<RFPTreeViewProps> = ({ rfpModel, selectedNodeId, onNodeSelect }) => {
   const [treeData, setTreeData] = React.useState<RFPNode[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
+  const getAllItemsWithChildrenItemIds = React.useCallback(() => {
+    const itemIds: string[] = [];
+    const traverse = (nodes: RFPNode[]) => {
+      nodes.forEach((node) => {
+        itemIds.push(node.id);
+        if (node.children) {
+          traverse(node.children);
+        }
+      });
+    };
+    traverse(treeData);
+    return itemIds;
+  }, [treeData]);
+
   React.useEffect(() => {
     if (rfpModel?.rfpId) {
-      setExpandedItems([rfpModel.rfpId]);
+      setExpandedItems(getAllItemsWithChildrenItemIds());
     }
-  }, [rfpModel?.rfpId]);
+  }, [rfpModel?.rfpId, getAllItemsWithChildrenItemIds]);
 
-  const handleItemExpansionToggle = (event: React.SyntheticEvent, itemIds: string[]) => {
+  const handleExpandedItemsChange = (
+    event: React.SyntheticEvent | null,
+    itemIds: string[],
+  ) => {
     setExpandedItems(itemIds);
   };
+
+  const handleExpandClick = () => {
+    setExpandedItems((oldExpanded) =>
+      oldExpanded.length === 0 ? getAllItemsWithChildrenItemIds() : [],
+    );
+  };
+
+
 
   React.useEffect(() => {
     if (!rfpModel) {
@@ -92,8 +93,6 @@ const RFPTreeView: React.FC<RFPTreeViewProps> = ({ rfpModel, selectedNodeId, onN
     }
 
     const buildTree = (): RFPNode[] => {
-      const nodes: RFPNode[] = [];
-
       // Add RFP node
       const rfpNode: RFPNode = {
         id: rfpModel.rfpId,
@@ -113,19 +112,19 @@ const RFPTreeView: React.FC<RFPTreeViewProps> = ({ rfpModel, selectedNodeId, onN
 
         // Add Epics and Features
         if (rfpModel.rfpSummary.epics?.length) {
-          summaryNode.children = rfpModel.rfpSummary.epics.map((epic: any) => {
+          summaryNode.children = rfpModel.rfpSummary.epics.map((epic: any, index: number) => {
             const epicNode: RFPNode = {
               id: epic.epicId,
-              name: epic.epicDescription || `Epic ${epic.epicId}`,
+              name: `Epic ${index + 1}`,
               type: 'epic',
               children: []
             };
 
             // Add Features to Epic
             if (epic.features?.length) {
-              epicNode.children = epic.features.map((feature: any) => ({
+              epicNode.children = epic.features.map((feature: any, index: number) => ({
                 id: feature.featureId,
-                name: feature.featureDescription || `Feature ${feature.featureId}`,
+                name: `Feature ${index + 1}`,
                 type: 'feature'
               }));
             }
@@ -155,19 +154,27 @@ const RFPTreeView: React.FC<RFPTreeViewProps> = ({ rfpModel, selectedNodeId, onN
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Typography variant="subtitle2" color="text.secondary">
+        <Typography variant="subtitle1" color="text.secondary"
+          onClick={() => onNodeSelect('resourceMix', 'resourceMix')}
+        >Resource Mix</Typography>
+      </Box>
+      <Box sx={{ p: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Typography variant="subtitle1" color="text.secondary">
           RFP Hierarchy
+          <Button onClick={handleExpandClick} size="small" sx={{ float: 'right' }}>
+            {expandedItems.length === 0 ? 'Expand' : 'Collapse'}
+          </Button>
         </Typography>
       </Box>
-      <Box sx={{ flex: 1, overflow: 'auto', p: 1 }}>
+      <Box sx={{ flex: 1, overflow: 'auto', p: 1, borderBottom: '1px solid', borderColor: 'divider' }}>
         <RichTreeView
           items={treeData}
           getItemLabel={(item) => item.name}
           expandedItems={expandedItems}
-          onExpandedItemsChange={handleItemExpansionToggle}
-          onItemSelectionToggle={(event, itemIds) => {
-            if (itemIds.length > 0) {
-              const selectedNode = findNodeById(treeData, itemIds[0]);
+          onExpandedItemsChange={handleExpandedItemsChange}
+          onItemSelectionToggle={(event, itemId) => {
+            if (itemId) {
+              const selectedNode = findNodeById(treeData, itemId);
               if (selectedNode) {
                 onNodeSelect(selectedNode.id, selectedNode.type);
               }
@@ -181,7 +188,10 @@ const RFPTreeView: React.FC<RFPTreeViewProps> = ({ rfpModel, selectedNodeId, onN
                 selectedNodeId={selectedNodeId}
                 item={props.item}
               />
-            )
+            ),
+            expandIcon: AddBoxIcon,
+            collapseIcon: IndeterminateCheckBoxIcon,
+            endIcon: CloseSquare
           }}
           sx={{
             '--TreeView-spacing': '4px',

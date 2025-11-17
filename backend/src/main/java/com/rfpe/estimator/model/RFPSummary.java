@@ -5,9 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -46,7 +48,7 @@ public class RFPSummary {
     @JsonIgnore
     private RFP rfp;
 
-    @OneToMany(mappedBy = "rfpSummary", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "rfpSummary", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Epic> epics;
 
     @Column(name = "create_date_time", nullable = false)

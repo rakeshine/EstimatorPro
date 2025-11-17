@@ -1,0 +1,88 @@
+{
+  "columns": {
+    "design1": "Fixed Goal Agent",
+    "design2": "Adaptive Goal Agent",
+    "design3": "Multi-Skill Agent",
+    "design4": "Specialized Skill Agent"
+  },
+
+  "rows": {
+    "description": {
+      "label": "Description",
+      "design1": "Operates with a predefined goal throughout lifecycle.",
+      "design2": "Adjusts or expands its goal based on context/feedback.",
+      "design3": "Equipped with multiple skills and selects them dynamically.",
+      "design4": "Focused on one deeply specialized skill."
+    },
+    "why_matters": {
+      "label": "Why it matters?",
+      "design1": "Predictable, simple, easy to validate.",
+      "design2": "Flexible and responsive to changing needs.",
+      "design3": "Versatile and usable across many scenarios.",
+      "design4": "High accuracy and expertise in a narrow domain."
+    },
+    "how_decide": {
+      "label": "How to decide?",
+      "design1": "- Is the problem domain stable and well-defined?\n- Are objectives unlikely to change over time?\n- Is operational simplicity a priority?",
+      "design2": "- Does the agent need to adapt goals based on input or environment?\n- Are there identifiable triggers for goal updates?\n- Can some goal variability be tolerated?",
+      "design3": "- Will the agent handle multiple distinct tasks?\n- Is dynamic skill selection or composition required?\n- Is modular skill architecture feasible?",
+      "design4": "- Is deep expertise in a narrow domain required?\n- Are performance and accuracy more important than generality?\n- Is ample domain-specific data available for tuning?"
+    },
+    "what_do": {
+      "label": "What to do?",
+      "design1": "Clearly define the goal upfront.",
+      "design2": "Define conditions/triggers for goal change.",
+      "design3": "Build modular, composable skill blocks.",
+      "design4": "Invest in rich domain-specific data/tuning."
+    },
+    "what_avoid": {
+      "label": "What to avoid?",
+      "design1": "Rigid goals that ignore environmental changes.",
+      "design2": "Goal drift; inconsistent updates.",
+      "design3": "Skill conflicts or orchestration complexity.",
+      "design4": "Overfitting, lack of generalization."
+    },
+    "default_starter": {
+      "label": "Default starter",
+      "design1": "Static goal set during setup/training.",
+      "design2": "Simple rule or policy for updating goals.",
+      "design3": "Skill library with selection mechanism.",
+      "design4": "Single finely tuned skill module."
+    },
+    "acceptance": {
+      "label": "Acceptance criteria",
+      "design1": "Consistently achieves fixed goal.",
+      "design2": "Properly adjusts goals based on signals.",
+      "design3": "Selects appropriate skills across tasks.",
+      "design4": "High accuracy and performance in the domain."
+    },
+    "tools": {
+      "label": "Tools / examples",
+      "design1": "Rule-based goal setting; scripted tasks.",
+      "design2": "Feedback loops; reinforcement learning.",
+      "design3": "Skill management frameworks; skill APIs.",
+      "design4": "Domain-specific models; specialized datasets."
+    },
+    "pros": {
+      "label": "Pros",
+      "design1": "Very simple, predictable.",
+      "design2": "Highly flexible.",
+      "design3": "Multipurpose, adaptable.",
+      "design4": "Very high performance in target domain."
+    },
+    "cons": {
+      "label": "Cons",
+      "design1": "Inflexible; cannot adapt.",
+      "design2": "Complex to manage consistency.",
+      "design3": "Large footprint, coordination complexity.",
+      "design4": "Narrow applicability."
+    },
+    "bottom_line": {
+      "label": "Bottom line",
+      "design1": "Choose when requirements are stable and simple.",
+      "design2": "Choose when environment is dynamic.",
+      "design3": "Choose when versatility is required.",
+      "design4": "Choose when deep expertise is required."
+    }
+  }
+}
