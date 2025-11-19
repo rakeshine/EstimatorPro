@@ -1,0 +1,166 @@
+{
+  "name": "epic-decomposer-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "epic-decomposer-agent",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryData": false
+        }
+      },
+      "id": "afcc9c7f-41e5-43cd-9647-b5b166093a3e",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -256
+      ],
+      "webhookId": "a86f4b61-d968-4c7e-b98c-37acd8af493a"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://192.168.86.21:1234/v1/chat/completions",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={{ $json}}",
+        "headerParametersJson": "{\n  \"Content-Type\":\"application/json\"\n}",
+        "queryParametersJson": "="
+      },
+      "id": "ff69edb3-b407-4d0b-8e08-dac8044dc3a2",
+      "name": "LLM Request (phi-3-mini)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "773a06cb-6e82-4dcd-b96c-1502d86c964b",
+      "name": "Return JSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        896,
+        -352
+      ],
+      "id": "a439ca1e-ba1c-4a02-85ec-9b794f2ea3c3",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  model: \"phi-3-mini-4k-instruct\",\n  messages: [\n    {\n      role: \"system\",\n      content: `\nYou are a senior solution architect.\nYou must ALWAYS respond with STRICT, VALID JSON with no additional text.\nIf you are unsure, output an empty array [].\nJSON must be minified or pretty-printed, but MUST NOT contain:\n- comments\n- trailing commas\n- explanations\n- markdown formatting\nOnly output pure JSON.\n`\n    },\n    {\n      role: \"user\",\n      content:\n        \"Break the given requirements into EPICS. Refer to summary for context and additional information for more detail.\\n\\n\" +\n        \"1. Functional Requirements:\\n\" +\n        $json.functionalRequirements + \"\\n\\n\" +\n        \"2. Non-Functional Requirements:\\n\" +\n        $json.nonFunctionalRequirements + \"\\n\\n\" +\n        \"3. Summary:\\n\" +\n        $json.summary + \"\\n\\n\" +\n        \"4. Additional Instructions:\\n\" +\n        $json.additionalInstructions + \"\\n\\n\" +\n        \"EPIC RULES:\\n\" +\n        \"- Combine related requirements.\\n\" +\n        \"- Produce 5–12 well-defined epics.\\n\" +\n        \"- Epic description must be 2–4 sentences.\\n\" +\n        \"- Do NOT go into feature-level details.\\n\" +\n        \"- Do NOT repeat the user's text.\\n\" +\n        \"- Do NOT generate features.\\n\\n\" +\n        \"OUTPUT RULES:\\n\" +\n        \"- Respond ONLY with valid JSON.\\n\" +\n        \"- JSON must be an array of objects.\\n\" +\n        \"- Each object MUST follow this schema:\\n\" +\n        `[\n  {\n    \"epicTitle\": \"string\",\n    \"epicDescription\": \"string\"\n  }\n]`\n    }\n  ]\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -352
+      ],
+      "id": "2c5420e6-a967-4799-9948-87900359461c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -448
+      ],
+      "id": "fbb84c7c-4bef-4aef-8cfc-fdc0876d4dd5",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Request (phi-3-mini)": {
+      "main": [
+        [
+          {
+            "node": "Return JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return JSON": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "LLM Request (phi-3-mini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "19c087de-3fe7-45e1-a27b-6e8fe7b05ed0",
+  "meta": {
+    "instanceId": "d55e03722a3e84d1cdc9ba738a7c5f82531e476a304cb8522aa5690474c352db"
+  },
+  "id": "zLj8E6zeiJk6fIqc",
+  "tags": []
+}

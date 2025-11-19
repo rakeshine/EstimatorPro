@@ -1,0 +1,208 @@
+Request for Proposal (RFP)
+
+Web Application Development for “Vendor Onboarding & Compliance Portal”**
+
+RFP Title: Vendor Onboarding & Compliance Portal
+Issued By: SreeRam Industries Pvt. Ltd.
+Issue Date: 18-Nov-2025
+RFP Reference: SRIPL/RFP/2025/112
+
+1. Introduction
+
+SreeRam Industries Pvt. Ltd. (SRIPL), a manufacturing and supply-chain company based in Chennai, seeks proposals from qualified software development firms to design and develop a Vendor Onboarding & Compliance Portal (VOCP).
+This platform will streamline vendor registration, document verification, performance scoring, and compliance tracking.
+
+2. Project Overview
+
+The current onboarding process is manual and involves email exchanges and multiple Excel sheets.
+The new web application will:
+
+Automate vendor registration and approvals
+
+Provide a central compliance dashboard
+
+Enable document uploads and validation
+
+Maintain an audit trail for all interactions
+
+Generate monthly compliance & performance reports
+
+The system must be responsive, secure, and scalable to support 3,000+ vendors and 200+ SRIPL staff.
+
+3. Scope of Work
+3.1 Functional Requirements
+A. User Management
+
+Admin, Compliance Officer, Procurement Manager, Vendor roles
+
+Two-factor authentication for Admin & Compliance Officers
+
+Activity logging (login, data changes, approvals)
+
+B. Vendor Onboarding
+
+Vendor self-registration form
+
+Uploads: PAN, GST, MSME Certificate, Cancelled Cheque, ISO Certifications
+
+Auto-validation for PAN (checksum), GST number (structure check)
+
+Procurement Manager review & approval workflow
+
+C. Compliance Module
+
+Annual compliance submission (safety compliance, ISO updates, financial reports)
+
+Automated reminders (email + SMS)
+
+Compliance scoring (0–100) based on submitted documents
+
+D. Performance Module
+
+Monthly performance submission
+
+Metrics tracked: Delivery Timeliness (%), Quality Score, Rejection Rate
+
+Automatic trend charts for last 12 months
+
+E. Reports
+
+Vendor master report (Excel/PDF)
+
+Compliance overdue report
+
+Performance trend reports
+
+Exportable dashboards
+
+F. Notifications
+
+Vendor registration confirmation
+
+Document rejection with comments
+
+Compliance due reminders (7 days, 3 days, 1 day)
+
+3.2 Non-Functional Requirements
+
+Performance:
+Must support 500 concurrent vendor logins.
+
+Security:
+SSL/TLS, AES-256 encrypted storage for sensitive documents, OWASP Top 10 compliance.
+
+Scalability:
+Should support 10,000 vendors in future phases.
+
+Tech Stack Preference:
+
+Backend: Spring Boot 3.x
+
+Frontend: React 18 + Material UI
+
+Database: PostgreSQL 15
+
+Hosting: AWS (ECS Fargate + RDS + S3)
+
+Availability:
+99.5% uptime.
+
+Audit:
+All CRUD actions must be logged with timestamp, user, and IP.
+
+4. Deliverables
+
+BRD + SRS documentation
+
+UI/UX wireframes & high-fidelity designs
+
+REST API + frontend development
+
+Database schema & ER diagram
+
+Integration with email/SMS provider
+
+Automated test suites + manual QA test cases
+
+Deployment on AWS
+
+Admin & user manuals
+
+3 months hypercare support
+
+Full source code
+
+5. Expected Timeline
+Phase	Duration	Dates
+Requirement Finalization	1 week	01-Dec-2025 → 07-Dec-2025
+UI/UX Design	2 weeks	08-Dec-2025 → 21-Dec-2025
+Development	6 weeks	22-Dec-2025 → 01-Feb-2026
+Testing (QA + UAT)	3 weeks	02-Feb-2026 → 22-Feb-2026
+Deployment	1 week	23-Feb-2026 → 29-Feb-2026
+
+Total expected time: 13 weeks
+
+6. Proposal Submission Requirements
+A. Company Profile
+
+Company name, registration details
+
+5–10 years experience in enterprise web development
+
+Minimum 3 similar projects (provide links/screenshots)
+
+B. Technical Proposal
+
+Include:
+
+Solution architecture diagram
+
+Technology stack justification
+
+Sample UI screens (if available)
+
+Security & scalability approach
+
+Risk mitigation strategy
+
+C. Commercial Proposal
+
+Provide fixed-cost pricing with breakup:
+
+Component	Cost (INR)
+UI/UX	₹1,50,000
+Backend Development	₹4,00,000
+Frontend Development	₹3,50,000
+QA & Automation	₹1,20,000
+Deployment & DevOps	₹80,000
+Support (3 months)	₹90,000
+Total	₹11,90,000
+
+Support renewal: ₹30,000/month (optional)
+
+D. Legal & Compliance
+
+NDA acceptance
+
+IP rights assigned to SRIPL
+
+Minimum 1-year warranty on bug fixes
+
+Proposals must be submitted by 05-Dec-2025, 5:00 PM IST.
+
+7. Evaluation Criteria
+Criteria	Weight
+Technical Fit	30%
+Relevant Experience	25%
+Cost Competitiveness	25%
+Delivery Timeline	10%
+Presentation Quality	10%
+8. Contact Information
+
+Primary Contact:
+Mr. Rakesh K
+Procurement & IT Operations
+SreeRam Industries Pvt. Ltd.
+Email: rakesh.k@sreeindustries.com
+
+Phone: +91-98765 43210

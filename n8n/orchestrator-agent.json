@@ -1,0 +1,296 @@
+{
+  "name": "orchestrator-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orchestrator-agent",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryData": true
+        }
+      },
+      "id": "a051086c-b1c5-4b3c-ba4b-8ea8b66edd90",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -576
+      ],
+      "webhookId": "4fcb0eab-e93e-4615-8f52-8bc911790177",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1520,
+        -336
+      ],
+      "id": "4627cf96-3f42-4c8e-b36c-44d09365667f",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "KX5LasVm47osiQ2l",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/KX5LasVm47osiQ2l",
+          "cachedResultName": "parser-agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        976,
+        -576
+      ],
+      "id": "2321de69-1daf-44ca-a17e-9d0dbbd11da2",
+      "name": "Call 'parser-agent'",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "zLj8E6zeiJk6fIqc",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/zLj8E6zeiJk6fIqc",
+          "cachedResultName": "epic-decomposer-agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1424,
+        -576
+      ],
+      "id": "1316efa6-5a59-4a89-99cf-4f6316a3add2",
+      "name": "Call 'epic-decomposer-agent'",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wUuBLMeir1YtuinF",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wUuBLMeir1YtuinF",
+          "cachedResultName": "feature-decomposer-agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        848,
+        -336
+      ],
+      "id": "8eabbd89-7eb1-4fd6-85e0-3cd5ae7613fd",
+      "name": "Call 'feature-decomposer-agent'",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "m6fU5m4jQiYIeIH2",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/m6fU5m4jQiYIeIH2",
+          "cachedResultName": "feature-estimator-agent"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1296,
+        -336
+      ],
+      "id": "1b3061f7-8809-4dae-bf43-43e1e49f30d4",
+      "name": "Call 'feature-estimator-agent'",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractCleanRFPSections(input) {\n  const clean = {};\n\n  // ------------------ SUMMARY ------------------\n  const summaryMatch = input.match(/\"summary\"\\s*:\\s*\"([^\"]*)\"/s);\n  clean.summary = summaryMatch ? summaryMatch[1].trim() : \"\";\n\n  // ------------------ FUNCTIONAL REQUIREMENTS ------------------\n  const frMatch = input.match(/\"functionalRequirements\"\\s*:\\s*\\[([\\s\\S]*?)\\]/);\n  if (frMatch) {\n    const frItems = frMatch[1]\n      .split(\"\\n\")\n      .map(line => line.replace(/\"|,|\\]/g, \"\").trim())\n      .filter(line => line.length > 0 && !line.includes(\":\"));\n\n    // Convert array → bullet-point string\n    clean.functionalRequirements = frItems.length\n      ? frItems.map(i => `• ${i}`).join(\"\\n\")\n      : \"\";\n  } else {\n    clean.functionalRequirements = \"\";\n  }\n\n  // ------------------ NON-FUNCTIONAL REQUIREMENTS ------------------\n  const nfrMatch = input.match(/\"nonFunctionalRequirements\"\\s*:\\s*\\[([\\s\\S]*?)\\]/);\n  if (nfrMatch) {\n    const nfrItems = nfrMatch[1]\n      .split(\"\\n\")\n      .map(line => line.replace(/\"|,|\\]/g, \"\").trim())\n      .filter(line => line.length > 0 && !line.includes(\":\"));\n\n    clean.nonFunctionalRequirements = nfrItems.length\n      ? nfrItems.map(i => `• ${i}`).join(\"\\n\")\n      : \"\";\n  } else {\n    clean.nonFunctionalRequirements = \"\";\n  }\n\n  return clean;\n}\n\nconst messyJson = $input.first().json.choices[0].message.content;\n\nreturn [\n  {\n    \"json\": extractCleanRFPSections(messyJson)\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -576
+      ],
+      "id": "db4e9f24-bf3a-447d-b22e-fd77289ff52d",
+      "name": "Extract Summary"
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractEpics(input) {\n  const epics = [];\n\n  // Regex to capture each epic block\n  const epicRegex = /\"epicTitle\"\\s*:\\s*\"([^\"]*)\"\\s*,\\s*\"epicDescription\"\\s*:\\s*\"([^\"]*)\"/g;\n\n  let match;\n  while ((match = epicRegex.exec(input)) !== null) {\n    epics.push({\n      epicTitle: match[1].trim(),\n      epicDescription: match[2].trim(),\n    });\n  }\n\n  return epics;\n}\n\nconst messyJson = $input.first().json.choices[0].message.content;\n\nreturn extractEpics(messyJson);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -576
+      ],
+      "id": "59f1d7fe-4320-4f20-a005-92c7fd23909d",
+      "name": "Extract Epics"
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractFeatures(input) {\n  const features = [];\n\n  // Regex to capture each feature block\n  const featureRegex = /\"featureTitle\"\\s*:\\s*\"([^\"]*)\"\\s*,\\s*\"featureDescription\"\\s*:\\s*\"([^\"]*)\"/g;\n\n  let match;\n  while ((match = featureRegex.exec(input)) !== null) {\n    features.push({\n      featureTitle: match[1].trim(),\n      featureDescription: match[2].trim(),\n    });\n  }\n\n  return features;\n}\n\nconst messyJson = $input.first().json.choices[0].message.content;\n\nreturn extractFeatures(messyJson);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        -336
+      ],
+      "id": "6a8851a7-1bbd-4964-b94d-dde16451722c",
+      "name": "Extract Features"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call 'parser-agent'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'parser-agent'": {
+      "main": [
+        [
+          {
+            "node": "Extract Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'epic-decomposer-agent'": {
+      "main": [
+        [
+          {
+            "node": "Extract Epics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'feature-decomposer-agent'": {
+      "main": [
+        [
+          {
+            "node": "Extract Features",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'feature-estimator-agent'": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Summary": {
+      "main": [
+        [
+          {
+            "node": "Call 'epic-decomposer-agent'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Epics": {
+      "main": [
+        [
+          {
+            "node": "Call 'feature-decomposer-agent'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Features": {
+      "main": [
+        [
+          {
+            "node": "Call 'feature-estimator-agent'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "37e73b8b-8525-4a89-a732-9b102b9a5976",
+  "meta": {
+    "instanceId": "d55e03722a3e84d1cdc9ba738a7c5f82531e476a304cb8522aa5690474c352db"
+  },
+  "id": "VI11FidEfliTcFm7",
+  "tags": []
+}

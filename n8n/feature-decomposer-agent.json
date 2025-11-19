@@ -1,0 +1,166 @@
+{
+  "name": "feature-decomposer-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feature-decomposer-agent",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryData": false
+        }
+      },
+      "id": "652d80dd-6af3-47e9-80c2-f3481d1fc18f",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -304
+      ],
+      "webhookId": "ae16ab6e-b8ef-420b-bd95-a2255665a681"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://192.168.86.21:1234/v1/chat/completions",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={{ $json}}",
+        "headerParametersJson": "{\n  \"Content-Type\":\"application/json\"\n}",
+        "queryParametersJson": "="
+      },
+      "id": "0fff026d-404d-42fd-a0ea-3c1ce46aeca7",
+      "name": "LLM Request (phi-3-mini)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "50158db1-7b5b-4420-bcbe-1a14e3aa557f",
+      "name": "Return JSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        896,
+        -400
+      ],
+      "id": "0b3f0633-8653-4c36-b010-cbcafba47443",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  model: \"phi-3-mini-4k-instruct\",\n  messages: [\n    {\n      role: \"system\",\n      content: `\nYou are a senior product/business analyst.\nYou MUST ALWAYS respond in STRICT VALID JSON — nothing else.\nYour output must contain:\n- NO markdown\n- NO explanations\n- NO comments\n- NO text before or after the JSON\n- NO trailing commas\n- NO missing keys\nIf you are unsure, output an empty array [].\n`\n    },\n    {\n      role: \"user\",\n      content:\n        \"Break the following EPIC into FEATURES.\\n\\n\" +\n        \"1. Epic Title:\\n\" +\n        $json.epicTitle + \"\\n\\n\" +\n        \"2. Epic Description:\\n\" +\n        $json.epicDescription + \"\\n\\n\" +\n        \"3. Additional Instructions:\\n\" +\n        $json.additionalInstructions + \"\\n\\n\" +\n        \"FEATURE RULES:\\n\" +\n        \"- Produce 4–10 features for the epic.\\n\" +\n        \"- Each feature must be independent, business-focused, non-technical.\\n\" +\n        \"- Descriptions must be 1–3 concise sentences.\\n\" +\n        \"- Do NOT include user stories, acceptance criteria, or tasks.\\n\" +\n        \"- Do NOT copy the epic text; rewrite concisely.\\n\\n\" +\n        \"OUTPUT RULES:\\n\" +\n        \"- Respond ONLY with valid JSON.\\n\" +\n        \"- JSON MUST be an array.\\n\" +\n        \"- Each item MUST conform to this strict schema:\\n\" +\n        `[\n  {\n    \"featureTitle\": \"string\",\n    \"featureDescription\": \"string\"\n  }\n]` +\n        \"\\n\" +\n        \"If the JSON is invalid, the entire output is considered incorrect.\"\n    }\n  ]\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -400
+      ],
+      "id": "510cd551-2eb6-4e8c-9ae6-311770f89a2e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -496
+      ],
+      "id": "428127d0-385e-4dde-a184-df944a3eb650",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Request (phi-3-mini)": {
+      "main": [
+        [
+          {
+            "node": "Return JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return JSON": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "LLM Request (phi-3-mini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2a7b3739-efb0-4be9-bf4d-8c91cf7e5f09",
+  "meta": {
+    "instanceId": "d55e03722a3e84d1cdc9ba738a7c5f82531e476a304cb8522aa5690474c352db"
+  },
+  "id": "wUuBLMeir1YtuinF",
+  "tags": []
+}

@@ -1,0 +1,189 @@
+{
+  "name": "parser-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "parser-agent",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryData": true
+        }
+      },
+      "id": "def43539-173f-4639-ac4f-903b24340d31",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        0,
+        16
+      ],
+      "webhookId": "a86f4b61-d968-4c7e-b98c-37acd8af493a"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://192.168.86.21:1234/v1/chat/completions",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={{ $json}}",
+        "headerParametersJson": "{\n  \"Content-Type\":\"application/json\"\n}",
+        "queryParametersJson": "="
+      },
+      "id": "a640525a-ff17-4882-8986-4fb870230dc7",
+      "name": "LLM Request (phi-3-mini)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c2785e23-2569-46e4-8ab3-92107067ec7e",
+      "name": "Return JSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        896,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1120,
+        -80
+      ],
+      "id": "68fe0289-a1fb-4a52-91ff-10447596c39b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -80
+      ],
+      "id": "b9ea4b42-0b00-4d16-938d-e2867a5b6eb6",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  model: \"phi-3-mini-4k-instruct\",\n  messages: [\n    {\n      role: \"system\",\n      content: `\nYou are a senior business analyst.\nYou MUST ALWAYS respond in STRICT VALID JSON.\nNo markdown. No explanation outside JSON.\nIf any section cannot be extracted, return an empty string for that field.\n`\n    },\n    {\n      role: \"user\",\n      content:\n        \"Extract the following from the provided RFP text:\\n\\n\" +\n        \"1. A concise summary (5–8 lines)\\n\" +\n        \"2. Functional requirements (bulleted text, string)\\n\" +\n        \"3. Non-functional requirements (bulleted text, string)\\n\\n\" +\n\n        \"Rules:\\n\" +\n        \"- Summary must be 5–8 lines (not bullets, not paragraphs).\\n\" +\n        \"- Functional requirements must be true functional needs only.\\n\" +\n        \"- Non-functional requirements must include items related to security, performance, scalability, availability, integration, compliance.\\n\" +\n        \"- Keep bullets as a single string with each item on a new line.\\n\" +\n        \"- Maintain a neutral tone.\\n\" +\n        \"- If information is unclear or missing, return \\\"\\\" for that field.\\n\" +\n        \"- Output MUST match the schema exactly.\\n\\n\" +\n\n        \"Respond STRICTLY in valid JSON:\\n\" +\n        `{\n  \"summary\": \"string\",\n  \"functionalRequirements\": \"string\",\n  \"nonFunctionalRequirements\": \"string\"\n}` +\n        \"\\n\\n\" +\n        \"RFP Text:\\n\" +\n        $json.data\n    }\n  ]\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -80
+      ],
+      "id": "a110691a-9109-4a4c-b541-99b4ded966d2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "ae6ac450-768e-4121-98fd-3cdff7007715",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "LLM Request (phi-3-mini)": {
+      "main": [
+        [
+          {
+            "node": "Return JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return JSON": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "LLM Request (phi-3-mini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "32eeafb3-5aa0-4f26-a8d7-7dc4040dcd3d",
+  "meta": {
+    "instanceId": "d55e03722a3e84d1cdc9ba738a7c5f82531e476a304cb8522aa5690474c352db"
+  },
+  "id": "KX5LasVm47osiQ2l",
+  "tags": []
+}

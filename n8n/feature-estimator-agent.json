@@ -1,0 +1,166 @@
+{
+  "name": "feature-estimator-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "feature-estimator-agent",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryData": false
+        }
+      },
+      "id": "ae849e87-33f0-4881-b039-2e9c434ab26a",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -304
+      ],
+      "webhookId": "6f38ecfe-7ddc-4da7-8a4f-f94829e01cbb"
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://192.168.86.21:1234/v1/chat/completions",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={{ $json}}",
+        "headerParametersJson": "{\n  \"Content-Type\":\"application/json\"\n}",
+        "queryParametersJson": "="
+      },
+      "id": "84bd8ea0-ce16-44fa-82c8-ae72da9e3441",
+      "name": "LLM Request (phi-3-mini)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "id": "b8115048-e760-498e-a266-7240f53b4321",
+      "name": "Return JSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        864,
+        -400
+      ],
+      "id": "068252e6-782c-4ea2-9dac-64cf42153a71",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\n  model: \"phi-3-mini-4k-instruct\",\n  messages: [\n    {\n      role: \"system\",\n      content: `\nYou are an expert engineering manager and business analyst.\nYou MUST ALWAYS respond in STRICT VALID JSON — nothing else.\nYour output must contain:\n- NO markdown\n- NO explanations outside the JSON field \"reason\"\n- NO comments\n- NO leading/trailing text\n- NO missing keys\n- NO trailing commas\nIf uncertain, return empty strings for values but keep schema intact.\n`\n    },\n    {\n      role: \"user\",\n      content:\n        \"Estimate effort using T-shirt sizing.\\n\" +\n        \"Refer to effort_size_map for unit & size mapping.\\n\\n\" +\n\n        \"1. Feature Title:\\n\" +\n        $json.featureTitle + \"\\n\\n\" +\n\n        \"2. Feature Description:\\n\" +\n        $json.featureDescription + \"\\n\\n\" +\n\n        \"3. Additional Instructions:\\n\" +\n        $json.additionalInstructions + \"\\n\\n\" +\n\n        \"4. Effort Unit:\\n\" +\n        (\n          $json.effort_unit\n          ? $json.effort_unit\n          : \"days\"\n        ) + \"\\n\\n\" +\n\n        \"5. Effort Size Map:\\n\" +\n        (\n          $json.effort_size_map\n          ? $json.effort_size_map\n          : `{\n  \"XS\": 2,\n  \"S\": 4,\n  \"M\": 6,\n  \"L\": 8,\n  \"XL\": 10,\n  \"XXL\": 12\n}`\n        ) + \"\\n\\n\" +\n\n        \"BUFFER RULES:\\n\" +\n        \"- ComplexityBuffer: 0–30% (numeric only)\\n\" +\n        \"- IntegrationBuffer: 0–20% (numeric only)\\n\" +\n        \"- RequirementsClarityBuffer: 0–30% (numeric only)\\n\" +\n        \"- If unsure, return empty values.\\n\\n\" +\n\n        \"OUTPUT RULES:\\n\" +\n        \"- Provide reasoning **inside the JSON field** named \\\"reason\\\".\\n\" +\n        \"- Output MUST match this exact schema:\\n\" +\n        `{\n  \"effortSize\": \"string\",\n  \"complexityBuffer\": \"string\",\n  \"integrationBuffer\": \"string\",\n  \"requirementsClarityBuffer\": \"string\",\n  \"reason\": \"string\"\n}` +\n        \"\\n\" +\n        \"Return STRICT JSON only.\"\n    }\n  ]\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -400
+      ],
+      "id": "328cc17c-a139-4986-b769-494f65b4e779",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        -496
+      ],
+      "id": "9ad2721f-855b-4535-a90b-0e636eb5e1ce",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LLM Request (phi-3-mini)": {
+      "main": [
+        [
+          {
+            "node": "Return JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return JSON": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "LLM Request (phi-3-mini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "dad9db34-dec7-4797-bcdb-bbc29b730314",
+  "meta": {
+    "instanceId": "d55e03722a3e84d1cdc9ba738a7c5f82531e476a304cb8522aa5690474c352db"
+  },
+  "id": "m6fU5m4jQiYIeIH2",
+  "tags": []
+}
